@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 import os
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
+
+    logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
     try:
         from django.core.management import execute_from_command_line
