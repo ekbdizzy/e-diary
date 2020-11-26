@@ -1,5 +1,5 @@
 from datacenter.models import Schoolkid, Mark, Chastisement, Commendation, Lesson, Subject
-from typing import NoReturn
+from typing import NoReturn, Union
 import random
 
 COMMENDATIONS = [
@@ -36,6 +36,20 @@ COMMENDATIONS = [
 ]
 
 
+def get_schoolkid(schoolkid_name: str) -> Union[Schoolkid, NoReturn]:
+    try:
+        schoolkid = Schoolkid.objects.get(full_name__contains=schoolkid_name)
+        return schoolkid
+
+    except Schoolkid.DoesNotExist:
+        print(f"Ученик {schoolkid_name} не найден.")
+        return
+
+    except Schoolkid.MultipleObjectsReturned:
+        print("Найдено несколько учеников, уточните запрос.")
+        return
+
+
 def fix_marks(schoolkid: Schoolkid) -> NoReturn:
     """Change points 1, 2, 3 to 5."""
     Mark.objects.filter(schoolkid=schoolkid, points__lte=3).update(points=5)
@@ -46,15 +60,7 @@ def remove_chastisements(schoolkid: Schoolkid) -> NoReturn:
 
 
 def create_commendation(schoolkid_name: str, subject_title: str) -> NoReturn:
-    try:
-        schoolkid = Schoolkid.objects.get(full_name__contains=schoolkid_name)
-    except Schoolkid.DoesNotExist:
-        print(f"Ученик {schoolkid_name} не найден.")
-        return
-    except Schoolkid.MultipleObjectsReturned:
-        print("Найдено несколько учеников, уточните запрос.")
-        return
-
+    schoolkid = get_schoolkid(schoolkid_name)
     year_of_study = schoolkid.year_of_study
     group_letter = schoolkid.group_letter
 
